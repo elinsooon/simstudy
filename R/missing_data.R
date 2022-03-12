@@ -273,8 +273,8 @@ genMiss <- function(dtName, missDefs, idvars,
 #' @return A missing data matrix of 0/1, where 1 indicates missing
 #' @noRd
 
-.genMissDataMat <- function(dtName, dtTemp, idvars, missDefs) {
-
+.genMissDataMat <- function(dtName, dtTemp, idvars, missDefs, envir = parent.frame()) {
+  
   # 'declare vars
   varname <- NULL
   logit.link <- NULL
@@ -284,19 +284,16 @@ genMiss <- function(dtName, missDefs, idvars,
 
   Expression <- parse(text = as.character(missDefs[, varname]))
   ColName <- as.character(missDefs[, varname]) # new data.table (changed 2016-12-05)
-  Formula <- parse(text = as.character(missDefs[, formula]))
 
+  Formula <- as.character(missDefs[, formula])
+  
   if (!missDefs[, logit.link]) {
-    # dtMissP[, eval(Expression) := dtName[, eval(Formula)]] # old data.table
 
-    dtMissP[, (ColName) := dtName[, eval(Formula)]]
+    dtMissP[, (ColName) := dtName[, .evalWith(Formula, .parseDotVars(Formula, envir), dtName)]]
   } else {
-    # dtMissP[, eval(Expression) := dtName[, .log2Prob(eval(Formula))]] # old data.table
-    dtMissP[, (ColName) := dtName[, .log2Prob(eval(Formula))]]
+    dtMissP[, (ColName) := dtName[, .log2Prob(.evalWith(Formula, .parseDotVars(Formula, envir), dtName))]]
   }
   matMiss <- dtMissP[, idvars, with = FALSE]
-  # matMiss[, eval(Expression) := stats::rbinom(nrow(dtMissP), 1, dtMissP[,
-  #                                     eval(Expression)])] # old data.table
 
   matMiss[, (ColName) := stats::rbinom(
     nrow(dtMissP), 1,
