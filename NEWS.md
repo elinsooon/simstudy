@@ -5,6 +5,10 @@
 
 * Major updates to functions defSurv and genSurv. It is now possible to generate survival outcomes with hazard functions that change over time. In addition, competing risk outcomes can be explicitly generated.
 
+## Minor improvements and fixes
+* Added double-dot functionality to missing data generation. It is now possible to
+specify global variables in `defMiss`.
+
 # simstudy 0.4.0
 
 ## New features
