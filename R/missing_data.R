@@ -97,7 +97,8 @@ defMiss <- function(dtDefs = NULL,
 #' @export
 #' @concept missing
 genMiss <- function(dtName, missDefs, idvars,
-                    repeated = FALSE, periodvar = "period") {
+                    repeated = FALSE, periodvar = "period",
+                    envir = parent.frame()) {
 
   # "Declare" vars to avoid R CMD warning
   varname <- NULL
@@ -119,7 +120,7 @@ genMiss <- function(dtName, missDefs, idvars,
 
     for (i in (1:nrow(tmDefs))) {
       dtTemp <- data.table::copy(dtName)
-      mat1 <- .genMissDataMat(dtName, dtTemp, idvars, tmDefs[i, ])
+      mat1 <- .genMissDataMat(dtName, dtTemp, idvars, tmDefs[i, ], envir)
       vec1 <- mat1[, tmDefs[i, varname], with = FALSE]
 
       dtMiss <- cbind(dtMiss, vec1)
